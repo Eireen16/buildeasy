@@ -3,26 +3,34 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
+use App\Models\Category;
+use App\Models\SubCategory;
 
 class CategorySeeder extends Seeder
 {
-    public function run(): void
+    public function run()
     {
         $categories = [
-            ['category' => 'Cement', 'sub_category' => 'Portland Cement'],
-            ['category' => 'Cement', 'sub_category' => 'White Cement'],
-            ['category' => 'Bricks', 'sub_category' => 'Clay Bricks'],
-            ['category' => 'Bricks', 'sub_category' => 'Fly Ash Bricks'],
-            ['category' => 'Paint', 'sub_category' => 'Acrylic Paint'],
-            ['category' => 'Paint', 'sub_category' => 'Oil-Based Paint'],
-            ['category' => 'Steel', 'sub_category' => 'TMT Bars'],
-            ['category' => 'Steel', 'sub_category' => 'Mild Steel Rods'],
-            ['category' => 'Wood', 'sub_category' => 'Plywood'],
-            ['category' => 'Wood', 'sub_category' => 'Hardwood'],
+            'Cement' => ['Portland Cement', 'White Cement', 'Quick Setting Cement', 'Sulfate Resistant Cement'],
+            'Steel' => ['Rebar', 'Steel Beams', 'Steel Sheets', 'Steel Pipes', 'Steel Wire'],
+            'Bricks' => ['Clay Bricks', 'Concrete Bricks', 'Fire Bricks', 'Fly Ash Bricks'],
+            'Sand' => ['River Sand', 'M-Sand', 'P-Sand', 'Robo Sand'],
+            'Tools' => ['Hand Tools', 'Power Tools', 'Measuring Tools', 'Safety Equipment'],
+            'Paint' => ['Interior Paint', 'Exterior Paint', 'Primer', 'Wood Stain'],
+            'Tiles' => ['Floor Tiles', 'Wall Tiles', 'Roof Tiles', 'Ceramic Tiles'],
+            'Wood' => ['Timber', 'Plywood', 'MDF Boards', 'Particle Boards']
         ];
 
-        DB::table('categories')->insert($categories);
+        foreach ($categories as $categoryName => $subCategories) {
+            $category = Category::create(['category' => $categoryName]);
+            
+            foreach ($subCategories as $subCategoryName) {
+                SubCategory::create([
+                    'category_id' => $category->id,
+                    'subcategory' => $subCategoryName
+                ]);
+            }
+        }
     }
 }
 

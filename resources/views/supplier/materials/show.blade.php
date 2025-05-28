@@ -1,9 +1,26 @@
-@extends('layouts.customer')
+@extends('layouts.supplier')
 
 @section('content')
-<div class="material-detail py-3 m-3" style="background-color: #a8d8e8; padding: 20px 0;">
+<div class="material-detail py-3 mt-3" style="background-color: #a8d8e8; padding: 20px 0;">
     <div class="container">
-         <h1 class="mb-4" style="color: #2980b9; font-size: 2.5rem; font-weight: bold; font-family: Arial, sans-serif;">Material Details</h1>
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h1 class="mb-4 mt-2" style="color: #2980b9; font-size: 2.5rem; font-weight: bold; font-family: Arial, sans-serif;"> Material Details</h1>
+            <div>
+                <a href="{{ route('materials.edit', $material) }}" class="btn btn-warning me-2">
+                    <i class="fas fa-edit"></i> Edit
+                </a>
+                <button class="btn btn-danger" onclick="confirmDelete({{ $material->id }})">
+                    <i class="fas fa-trash"></i> Delete
+                </button>
+                
+                <!-- Hidden form for delete -->
+                <form id="delete-form-{{ $material->id }}" action="{{ route('materials.destroy', $material) }}" method="POST" style="display: none;">
+                    @csrf
+                    @method('DELETE')
+                </form>
+            </div>
+        </div>
+
         <div class="row">
             <div class="col-md-6">
                 <!-- Image Gallery -->
@@ -31,50 +48,54 @@
                     @endif
                 </div>
             </div>
-            
+           
             <div class="col-md-6">
                 <!-- Material Details -->
                 <div class="material-info">
                     <h1>{{ $material->name }}</h1>
                     <p class="text-muted">{{ $material->category->category }} > {{ $material->subCategory->subcategory }}</p>
-                    
+                   
                     <div class="price-info mb-3">
                         <h2 class="text-dark">RM{{ number_format($material->price, 2) }}</h2>
                         <p class="text-muted">Stock Available: {{ $material->stock }} units</p>
                     </div>
 
-                <!-- Variations Section -->
+                    <!-- Statistics -->
+                    <div class="col-4 text-center">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h4 class="text-success">0</h4>
+                                <small>Orders</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Variations -->
                     @if($material->variations->count() > 0)
-                    <div class="variations-section mb-3">
-                        <p class="fw-semibold mb-2">Variations</p>
-                        <div class="d-flex flex-wrap gap-2">
-                            @foreach($material->variations as $variation)
-                                <button class="btn btn-outline-secondary btn-sm variation-btn text-center" data-variation="{{ $variation->id }}">
-                                    {{ $variation->variation_name }}: {{ $variation->variation_value }}<br>
-                                    <small>(Stock: {{ $variation->stock }})</small>
-                                </button>
-                            @endforeach
+                        <div class="variations mb-4 mt-3">
+                            <h5>Available Variations</h5>
+                            <div class="table-responsive">
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Type</th>
+                                            <th>Value</th>
+                                            <th>Stock</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($material->variations as $variation)
+                                            <tr>
+                                                <td>{{ $variation->variation_name }}</td>
+                                                <td>{{ $variation->variation_value }}</td>
+                                                <td>{{ $variation->stock }} units</td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
-                    </div>
                     @endif
-
-                <!-- Quantity -->
-                    <div class="quantity-section mb-3">
-                        <p class="fw-semibold mb-2">Quantity</p>
-                        <div class="d-flex align-items-center">
-                            <button class="btn btn-outline-secondary" type="button" onclick="decreaseQuantity()" style="width: 40px;">-</button>
-                            <input type="number" class="form-control text-center mx-2" id="quantity" value="1" min="1" max="{{ $material->stock }}" style="width: 60px;">
-                            <button class="btn btn-outline-secondary" type="button" onclick="increaseQuantity()" style="width: 40px;">+</button>
-                        </div>
-                    </div>
-
-
-                    <!-- Action Buttons -->
-                    <div class="action-buttons">
-                        <button class="btn btn-primary btn-lg me-2" onclick="addToCart()">
-                            <i class="fas fa-shopping-cart"></i> Add to Cart
-                        </button>
-                    </div>
                 </div>
             </div>
         </div>
@@ -93,7 +114,7 @@
             </div>
         </div>
 
-               <!-- Sustainability Rating Section -->
+        <!-- Sustainability Rating Section -->
         <div class="row mt-5">
             <div class="col-12">
                 <div class="card">
@@ -145,44 +166,7 @@
             </div>
         </div>
 
-        <!-- Shop Information Section -->
-        <div class="row mt-5">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-header bg-light">
-                        <h5>Shop Information</h5>
-                    </div>
-                    <div class="card-body d-flex justify-content-between align-items-center flex-wrap">
-                        <div class="d-flex align-items-center gap-3">
-                            <img 
-                                src="{{ $material->supplier->profile_picture ? asset('storage/profile_pictures' . $material->supplier->profile_picture) : asset('images/DefaultProfile.png') }}" 
-                                alt="Profile Picture" 
-                                class="rounded-circle" 
-                                style="width: 60px; height: 60px; object-fit: cover;"
-                            >
-                            <div>
-                                <h6 class="mb-1 fw-bold">{{ $material->supplier->company_name }}</h6>
-                                    <div>
-                                        <small class="d-block">
-                                            <span class="fw-bold">Phone Number</span> {{ $material->supplier->phone ?? 'Not Available' }}
-                                        </small>
-                                        <small class="d-block">
-                                            <span class="fw-bold">Shop Address</span> {{ $material->supplier->address?? 'Not Available' }}
-                                        </small>
-                                    </div>
-                            </div>
-                        </div>
-                        <div class="text-center mt-3 mt-md-0">
-                            <button class="btn btn-outline-dark" onclick="chatWithSupplier()">
-                        <i class="fas fa-comment-dots me-1"></i> Chat with supplier
-                    </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-                <!-- Review Section -->
+        <!-- Review Section -->
         <div class="row mt-5">
             <div class="col-12">
                 <div class="card">
@@ -222,58 +206,12 @@
     </div>
 </div>
 
-<style>
-.variation-btn.active {
-    background-color: #007bff;
-    color: white;
-    border-color: #007bff;
-}
-
-.product-info-card {
-    background-color: rgba(173, 216, 230, 0.3) !important;
-}
-</style>
-
 <script>
-function increaseQuantity() {
-    const quantityInput = document.getElementById('quantity');
-    const currentValue = parseInt(quantityInput.value);
-    const maxValue = parseInt(quantityInput.max);
-    
-    if (currentValue < maxValue) {
-        quantityInput.value = currentValue + 1;
+function confirmDelete(materialId) {
+    if (confirm('Are you sure you want to delete this material? This action cannot be undone.')) {
+        document.getElementById('delete-form-' + materialId).submit();
     }
 }
-
-function decreaseQuantity() {
-    const quantityInput = document.getElementById('quantity');
-    const currentValue = parseInt(quantityInput.value);
-    
-    if (currentValue > 1) {
-        quantityInput.value = currentValue - 1;
-    }
-}
-
-function addToCart() {
-    alert('Add to cart functionality will be implemented later');
-}
-
-function chatWithSupplier() {
-    alert('Chat with supplier will be implemented later');
-}
-
-
-// Variation selection
-document.addEventListener('DOMContentLoaded', function() {
-    const variationBtns = document.querySelectorAll('.variation-btn');
-    
-    variationBtns.forEach(btn => {
-        btn.addEventListener('click', function() {
-            variationBtns.forEach(b => b.classList.remove('active'));
-            this.classList.add('active');
-        });
-    });
-});
 </script>
 
 @endsection

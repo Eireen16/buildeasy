@@ -6,38 +6,26 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
-    public function up(): void
+    public function up()
     {
         Schema::create('materials', function (Blueprint $table) {
             $table->id();
             $table->foreignId('supplier_id')->constrained('suppliers')->onDelete('cascade');
-            $table->foreignId('category_id')->constrained('categories')->onDelete('cascade');
+            $table->foreignId('category_id')->constrained()->onDelete('cascade');
+            $table->foreignId('sub_category_id')->constrained()->onDelete('cascade');
             $table->string('name');
             $table->decimal('price', 10, 2);
             $table->integer('stock');
-            $table->json('images'); 
-            $table->json('variations'); 
             $table->text('description');
-    
-            // Ratings (stored as integers from 1 to 5)
-            $table->tinyInteger('environmental_impact_rating');
-            $table->tinyInteger('carbon_footprint_rating');
-            $table->tinyInteger('recyclability_rating');
-    
-            // Sustainability rating (average of the three)
-            $table->decimal('sustainability_rating', 3, 2);
-    
+            $table->integer('environmental_impact_rating')->default(1); // 1-5 stars
+            $table->integer('carbon_footprint_rating')->default(1); // 1-5 stars
+            $table->integer('recyclability_rating')->default(1); // 1-5 stars
+            $table->decimal('sustainability_rating', 3, 2)->default(1.00); // calculated average
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
+    public function down()
     {
         Schema::dropIfExists('materials');
     }

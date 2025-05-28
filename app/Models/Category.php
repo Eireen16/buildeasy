@@ -9,14 +9,17 @@ class Category extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'category',
-        'sub_category',
-    ];
+    protected $fillable = ['category'];
 
+    // Relationship: A category has many sub-categories
+    public function subCategories()
+    {
+        return $this->hasMany(SubCategory::class);
+    }
+
+    // Relationship: A category has many materials
     public function materials()
     {
         return $this->hasMany(Material::class);
     }
 }
-

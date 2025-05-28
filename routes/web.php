@@ -42,7 +42,7 @@ Route::get('/register/supplier', [SupplierRegisterController::class, 'showForm']
 Route::post('/register/supplier', [SupplierRegisterController::class, 'register']);
 
 
-// Customer dashboard route
+// Customer dashboard route after log in
 Route::get('/customer/dashboard', function () {
     if (Auth::check() && Auth::user()->role === 'customer') {
         return view('customer.dashboard');
@@ -50,22 +50,24 @@ Route::get('/customer/dashboard', function () {
     return abort(403); // Forbidden
 })->middleware('auth')->name('customer.dashboard');
 
-//Customer profile view and edit route
+//Customer's routes
 Route::middleware(['auth'])->group(function () {
+    //Customer profile view and edit route
     Route::get('/customer/profile', [CustomerController::class, 'showProfile'])->name('customer.profile');
     Route::get('/customer/profile/edit', [CustomerController::class, 'editProfile'])->name('customer.profile.edit');
     Route::put('/customer/profile/update', [CustomerController::class, 'updateProfile'])->name('customer.profile.update');
+
+    // Customer dashboard and material routes
+    Route::get('/customer/dashboard', [CustomerMaterialController::class, 'index'])->name('customer.dashboard');
+    Route::get('/customer/materials/{id}', [CustomerMaterialController::class, 'show'])->name('customer.materials.show');
 });
 
-// Customer view materials routes
-Route::get('/customer/dashboard', [CustomerMaterialController::class, 'index'])->name('customer.dashboard');
-Route::get('/customer/materials/{id}', [CustomerMaterialController::class, 'show'])->name('customer.materials.show');
 
-//Customer search materials route
+//!!!!SEARCH FROM CUSTOMER LAYOUT (REMOVE SOON) !!!!!!
 Route::get('/search', [App\Http\Controllers\CustomerMaterialController::class, 'search'])->name('customer.materials.search');
 Route::get('/materials/search', [CustomerMaterialController::class, 'search'])->name('materials.search');
 
-// Supplier dashboard route
+// Supplier dashboard route after log in
 Route::get('/supplier/dashboard', function () {
     if (Auth::check() && Auth::user()->role === 'supplier') {
         return view('supplier.dashboard');
@@ -73,24 +75,32 @@ Route::get('/supplier/dashboard', function () {
     return abort(403); // Forbidden
 })->middleware('auth')->name('supplier.dashboard');
 
-//Supplier profile view and edit route
+//Supplier's routes
 Route::middleware(['auth'])->group(function () {
+    //Supplier profile view and edit route
     Route::get('/supplier/profile', [SupplierController::class, 'showProfile'])->name('supplier.profile');
     Route::get('/supplier/profile/edit', [SupplierController::class, 'editProfile'])->name('supplier.profile.edit');
     Route::put('/supplier/profile/update', [SupplierController::class, 'updateProfile'])->name('supplier.profile.update');
-});
 
-// Routes for supplier to add materials
-Route::middleware(['auth'])->group(function () {
+    // Material creation routes
     Route::get('/supplier/materials/create', [MaterialController::class, 'create'])->name('materials.create');
     Route::post('/supplier/materials', [MaterialController::class, 'store'])->name('materials.store');
-});
 
-// Supplier view materials routes
-Route::get('/supplier/dashboard', [SupplierMaterialController::class, 'index'])->name('supplier.dashboard');
-Route::get('/supplier/materials/{id}', [SupplierMaterialController::class, 'show'])->name('supplier.materials.show');
+    // API route for getting subcategories
+    Route::get('/api/categories/{category}/subcategories', [MaterialController::class, 'getSubCategories']);
 
-// Admin dashboard route
+    // Supplier dashboard and material routes
+    Route::get('/supplier/dashboard', [SupplierMaterialController::class, 'index'])->name('supplier.dashboard');
+    Route::get('/supplier/materials/{id}', [SupplierMaterialController::class, 'show'])->name('supplier.materials.show');
+
+    //Supplier Edit and Delete Material
+        Route::get('/materials/{material}/edit', [MaterialController::class, 'edit'])->name('materials.edit');
+        Route::put('/materials/{material}', [MaterialController::class, 'update'])->name('materials.update');
+        Route::delete('/materials/{material}', [MaterialController::class, 'destroy'])->name('materials.destroy');
+  });
+
+
+// Admin dashboard route after log in
 Route::get('/admin/dashboard', function () {
     if (Auth::check() && Auth::user()->role === 'admin') {
         return view('admin.dashboard');

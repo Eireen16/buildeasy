@@ -1,7 +1,7 @@
 @extends('layouts.customer')
 
 @section('content')
-<div class="container-fluid p-0">
+<div class="container-fluid p-0 mt-3">
     <div style="background-color: #a8d8e8; padding: 20px 0;">
         <div class="container">
             <h1 class="mb-4" style="color: #2980b9; font-size: 2.5rem; font-weight: bold; font-family: Arial, sans-serif;">My Profile</h1>
@@ -39,7 +39,7 @@
                 </div>
 
                 <div class="mb-4">
-                    <label for="Address" class="form-label">Shop Address</label>
+                    <label for="Address" class="form-label">Address</label>
                     <input type="text" class="form-control" id="Address" 
                            value="{{ $customer->address ?? 'Please set up your address' }}" 
                            {{ isset($editMode) && $editMode ? '' : 'readonly' }}>

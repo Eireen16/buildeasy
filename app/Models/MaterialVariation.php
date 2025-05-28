@@ -9,11 +9,11 @@ class MaterialVariation extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['material_id', 'variation_name', 'stock'];
+    protected $fillable = ['material_id', 'variation_name', 'variation_value', 'stock'];
 
+    // Relationship: A variation belongs to a material
     public function material()
     {
         return $this->belongsTo(Material::class);
     }
 }
-

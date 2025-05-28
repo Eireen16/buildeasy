@@ -6,25 +6,19 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
-    public function up(): void
-{
-    Schema::create('material_variations', function (Blueprint $table) {
-        $table->id();
-        $table->foreignId('material_id')->constrained()->onDelete('cascade');
-        $table->string('variation_name'); // e.g. "Blue", "Large"
-        $table->integer('stock')->default(0);
-        $table->timestamps();
-    });
-}
+    public function up()
+    {
+        Schema::create('material_variations', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('material_id')->constrained()->onDelete('cascade');
+            $table->string('variation_name'); // e.g., "Color", "Size"
+            $table->string('variation_value'); // e.g., "Blue", "Large"
+            $table->integer('stock'); // stock for this specific variation
+            $table->timestamps();
+        });
+    }
 
-
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
+    public function down()
     {
         Schema::dropIfExists('material_variations');
     }
