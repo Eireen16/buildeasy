@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\View;
+use App\View\Components\CartComposer;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -17,8 +19,9 @@ class AppServiceProvider extends ServiceProvider
     /**
      * Bootstrap any application services.
      */
-    public function boot(): void
+    public function boot()
     {
-        //
+        // Register the cart composer for customer layout
+        View::composer('layouts.customer', CartComposer::class);
     }
 }

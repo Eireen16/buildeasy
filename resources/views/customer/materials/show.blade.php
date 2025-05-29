@@ -235,6 +235,65 @@
 </style>
 
 <script>
+
+async function addToCart() {
+    const quantityInput = document.getElementById('quantity');
+    const quantity = parseInt(quantityInput.value);
+    
+    // Get selected variation if any
+    const selectedVariation = document.querySelector('.variation-btn.active');
+    const variationId = selectedVariation ? selectedVariation.getAttribute('data-variation') : null;
+    
+    // Validate selection
+    if (document.querySelectorAll('.variation-btn').length > 0 && !variationId) {
+        alert('Please select a variation');
+        return;
+    }
+    
+    if (quantity <= 0) {
+        alert('Please enter a valid quantity');
+        return;
+    }
+    
+    try {
+        const response = await fetch('/customer/cart/add', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
+            body: JSON.stringify({
+                material_id: {{ $material->id }}, 
+                quantity: quantity,
+                variation_id: variationId
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            alert(data.success);
+
+            // Update cart count if provided in response
+            if (data.cart_count !== undefined) {
+                updateCartCount(data.cart_count);
+            }
+
+            // Optional: Reset quantity to 1
+            quantityInput.value = 1;
+            // Optional: Clear variation selection
+            if (selectedVariation) {
+                selectedVariation.classList.remove('active');
+            }
+        } else {
+            alert(data.error || 'Error adding item to cart');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error adding item to cart');
+    }
+}
+
 function increaseQuantity() {
     const quantityInput = document.getElementById('quantity');
     const currentValue = parseInt(quantityInput.value);
@@ -254,15 +313,6 @@ function decreaseQuantity() {
     }
 }
 
-function addToCart() {
-    alert('Add to cart functionality will be implemented later');
-}
-
-function chatWithSupplier() {
-    alert('Chat with supplier will be implemented later');
-}
-
-
 // Variation selection
 document.addEventListener('DOMContentLoaded', function() {
     const variationBtns = document.querySelectorAll('.variation-btn');
@@ -271,9 +321,23 @@ document.addEventListener('DOMContentLoaded', function() {
         btn.addEventListener('click', function() {
             variationBtns.forEach(b => b.classList.remove('active'));
             this.classList.add('active');
+
+            // Update max quantity based on selected variation
+            const quantityInput = document.getElementById('quantity');
+            const variationStock = this.querySelector('small').textContent.match(/\d+/)[0];
+            quantityInput.max = variationStock;
+            
+            // Reset quantity to 1 if current quantity exceeds new max
+            if (parseInt(quantityInput.value) > parseInt(variationStock)) {
+                quantityInput.value = 1;
+            }
         });
     });
 });
+
+function chatWithSupplier() {
+    alert('Chat with supplier will be implemented later');
+}
 </script>
 
 @endsection

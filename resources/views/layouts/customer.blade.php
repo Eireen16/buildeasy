@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>BuildEasy</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -73,6 +74,43 @@
             border-radius: 0;
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
+
+        /* Cart Badge Styles */
+        .cart-badge {
+            position: absolute;
+            top: -5px;
+            right: -8px;
+            background-color: #dc3545;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 11px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            border: 2px solid white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            z-index: 10;
+        }
+
+        .cart-badge:empty {
+            display: none;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .cart-badge {
+                width: 18px;
+                height: 18px;
+                font-size: 10px;
+                top: -3px;
+                right: -6px;
+            }
+        }
+
     </style>
 </head>
 <body>
@@ -112,9 +150,14 @@
                         </div>
                         
                         <div class="text-center">
-                            <button class="icon-btn" onclick="window.location.href='{{ url('/customer/cart') }}'">
-                                <i class="fas fa-shopping-cart"></i>
-                            </button>
+                            <div class="position-relative d-inline-block">
+                                <button class="icon-btn" onclick="window.location.href='{{ url('/customer/cart') }}'">
+                                    <i class="fas fa-shopping-cart"></i>
+                                </button>
+                                @if(isset($cartItemsCount) && $cartItemsCount > 0)
+                                    <span class="cart-badge" id="cart-count">{{ $cartItemsCount > 99 ? '99+' : $cartItemsCount }}</span>
+                                @endif
+                            </div>
                             <span class="nav-labels">My cart</span>
                         </div>
                         
@@ -179,5 +222,32 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Function to update cart count badge
+        function updateCartCount(count) {
+            const cartBadge = document.getElementById('cart-count');
+            const cartButton = document.querySelector('.position-relative');
+            
+            if (count > 0) {
+                if (cartBadge) {
+                    cartBadge.textContent = count > 99 ? '99+' : count;
+                } else {
+                    // Create badge if it doesn't exist
+                    const badge = document.createElement('span');
+                    badge.className = 'cart-badge';
+                    badge.id = 'cart-count';
+                    badge.textContent = count > 99 ? '99+' : count;
+                    cartButton.appendChild(badge);
+                }
+            } else {
+                // Remove badge if count is 0
+                if (cartBadge) {
+                    cartBadge.remove();
+                }
+            }
+        }
+    </script>
+
 </body>
 </html>

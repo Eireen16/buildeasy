@@ -9,6 +9,7 @@ use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\MaterialController;
 use App\Http\Controllers\SupplierMaterialController;
 use App\Http\Controllers\CustomerMaterialController;
+use App\Http\Controllers\CartController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 
@@ -31,7 +32,7 @@ require __DIR__.'/auth.php';
 // Role selection page
 Route::get('/register', function () {
     return view('auth.register');
-})->name('register'); // Add this name
+})->name('register'); 
 
 // Customer registration
 Route::get('/register/customer', [CustomerRegisterController::class, 'showForm']);
@@ -60,6 +61,12 @@ Route::middleware(['auth'])->group(function () {
     // Customer dashboard and material routes
     Route::get('/customer/dashboard', [CustomerMaterialController::class, 'index'])->name('customer.dashboard');
     Route::get('/customer/materials/{id}', [CustomerMaterialController::class, 'show'])->name('customer.materials.show');
+
+    // Cart routes
+    Route::get('/customer/cart', [CartController::class, 'index'])->name('customer.cart.index');
+    Route::post('/customer/cart/add', [CartController::class, 'addToCart'])->name('customer.cart.add');
+    Route::patch('/customer/cart/update/{id}', [CartController::class, 'updateQuantity'])->name('customer.cart.update');
+    Route::delete('/customer/cart/remove/{id}', [CartController::class, 'removeItem'])->name('customer.cart.remove');
 });
 
 

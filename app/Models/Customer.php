@@ -22,5 +22,20 @@ class Customer extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    // Relationship: A customer has one cart
+    public function cart()
+    {
+        return $this->hasOne(Cart::class);
+    }
+
+    // Get or create cart for customer
+    public function getOrCreateCart()
+    {
+        if (!$this->cart) {
+            $this->cart()->create();
+        }
+        return $this->cart;
+    }
 }
 
