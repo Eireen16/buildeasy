@@ -157,4 +157,34 @@ class CartController extends Controller
 
         ]);
     }
+
+    public function debugCart()
+{
+    $customer = Customer::where('user_id', Auth::id())->first();
+    $cart = $customer->cart;
+    $cartItems = $cart->cartItems()->with(['material', 'materialVariation'])->get();
+    
+    $debug = [
+        'customer_id' => $customer->id,
+        'cart_id' => $cart->id,
+        'total_items' => $cart->total_items,
+        'cart_total' => $cart->total,
+        'items' => []
+    ];
+    
+    foreach ($cartItems as $item) {
+        $debug['items'][] = [
+            'id' => $item->id,
+            'material_name' => $item->material->name,
+            'quantity' => $item->quantity,
+            'price' => $item->price,
+            'subtotal' => $item->subtotal,
+            'variation' => $item->materialVariation ? 
+                        $item->materialVariation->variation_name . ': ' . $item->materialVariation->variation_value : 
+                         'No variation'
+        ];
+    }
+    
+    dd($debug);
+}
 }

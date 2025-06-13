@@ -1,3 +1,6 @@
+@php
+    $categories = $categories ?? \App\Models\Category::with('subCategories')->get();
+@endphp
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -73,6 +76,56 @@
             border-radius: 0;
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
+
+        /* Dropdown submenu styles */
+        .dropdown-submenu {
+            position: relative;
+        }
+
+        .dropdown-submenu .dropdown-menu {
+            top: 0;
+            left: 100%;
+            margin-top: -1px;
+            margin-left: -1px;
+            border-radius: 0.375rem;
+        }
+
+        .dropdown-submenu:hover .dropdown-menu {
+            display: block;
+        }
+
+        .dropdown-menu .dropdown-menu {
+            display: none;
+        }
+
+        /* Alternative: Show subcategories on click instead of hover */
+        .dropdown-submenu > .dropdown-item:after {
+            display: block;
+            content: " ";
+            float: right;
+            width: 0;
+            height: 0;
+            border-color: transparent;
+            border-style: solid;
+            border-width: 5px 0 5px 5px;
+            border-left-color: #ccc;
+            margin-top: 5px;
+            margin-right: -10px;
+        }
+
+        .dropdown-submenu:hover > .dropdown-item:after {
+            border-left-color: #adb5bd;
+        }
+
+        .dropdown-submenu.pull-left {
+            float: none;
+        }
+
+        .dropdown-submenu.pull-left > .dropdown-menu {
+            left: -100%;
+            margin-left: 10px;
+            border-radius: 0.375rem;
+        }
     </style>
 </head>
 <body>
@@ -90,10 +143,12 @@
                 </div>
                 <div class="col-md-6 col-sm-12 my-2">
                     <div class="search-container">
-                        <input type="text" class="form-control" placeholder="Search Products">
-                        <button type="submit">
-                            <i class="fas fa-search"></i>
-                        </button>
+                        <form action="{{ route('supplier.search') }}" method="GET" class="d-flex">
+                            <input type="text" name="search" class="form-control" placeholder="Search Products" value="{{ request('search') }}">
+                            <button type="submit" class="btn btn-primary ms-2">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </form>
                     </div>
                 </div>
                 <div class="col-md-4 col-sm-12">
@@ -136,11 +191,26 @@
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Category</a>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="{{ url('/supplier/category/cement') }}">Cement</a></li>
-                        <li><a class="dropdown-item" href="{{ url('/supplier/category/steel') }}">Steel</a></li>
-                        <li><a class="dropdown-item" href="{{ url('/supplier/category/bricks') }}">Bricks</a></li>
-                        <li><a class="dropdown-item" href="{{ url('/supplier/category/sand') }}">Sand</a></li>
-                        <li><a class="dropdown-item" href="{{ url('/supplier/category/tools') }}">Tools</a></li>
+                        @forelse($categories as $category)
+                            <li class="dropdown-submenu">
+                                <a class="dropdown-item" href="{{ route('supplier.category', $category->id) }}">
+                                    {{ $category->category }}
+                                </a>
+                                @if($category->subCategories->count() > 0)
+                                    <ul class="dropdown-menu">
+                                        @foreach($category->subCategories as $subCategory)
+                                            <li>
+                                                <a class="dropdown-item" href="{{ route('supplier.subcategory', [$category->id, $subCategory->id]) }}">
+                                                    {{ $subCategory->subcategory }}
+                                                </a>
+                                            </li>
+                                        @endforeach
+                                    </ul>
+                                @endif
+                            </li>
+                        @empty
+                            <li><a class="dropdown-item disabled" href="#">No categories available</a></li>
+                        @endforelse
                     </ul>
                 </li>
                 <li class="nav-item">

@@ -64,7 +64,7 @@
                     <div class="col-4 text-center">
                         <div class="card bg-light">
                             <div class="card-body">
-                                <h4 class="text-success">0</h4>
+                                <h4 class="text-success">{{ $orderCount }}</h4>
                                 <small>Orders</small>
                             </div>
                         </div>
@@ -168,41 +168,117 @@
 
         <!-- Review Section -->
         <div class="row mt-5">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-header">
-                        <h5>Reviews</h5>
-                    </div>
-                    <div class="card-body">
-
-                        <!-- USE THIS LATER WHEN IMPLEMENTING REVIEW 
-                        @if($material->reviews && $material->reviews->count() > 0)
-                            @foreach($material->reviews as $review)
-                                <div class="review-item mb-3 pb-3 border-bottom">
-                                    <div class="d-flex align-items-center mb-2">
-                                        <div class="review-avatar me-3">
-                                            <i class="fas fa-user-circle fa-2x text-muted"></i>
-                                        </div>
-                                        <div>
-                                            <div class="fw-bold">{{ $review->customer_name ?? 'Customer Name' }}</div>
-                                            <div class="rating">
-                                                @for($i = 1; $i <= 5; $i++)
-                                                    <i class="fas fa-star {{ $i <= $review->rating ? 'text-warning' : 'text-muted' }}" style="font-size: 0.8rem;"></i>
-                                                @endfor
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <p class="mb-0">{{ $review->comment }}</p>
-                                </div>
-                            @endforeach
-                        @else
-                            <div class="text-muted">No reviews yet</div>
-                        @endif -->
-                       <small>No Reviews yet</small>  
-                    </div>
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Reviews</h5>
+                    @if($reviewCount > 0)
+                        <div class="text-muted">
+                            <span class="fw-bold">{{ number_format($averageRating, 1) }}</span>
+                            <span class="rating me-2">
+                                @for($i = 1; $i <= 5; $i++)
+                                    <i class="fas fa-star {{ $i <= round($averageRating) ? 'text-warning' : 'text-muted' }}" style="font-size: 0.9rem;"></i>
+                                @endfor
+                            </span>
+                            ({{ $reviewCount }} {{ $reviewCount == 1 ? 'review' : 'reviews' }})
+                        </div>
+                    @endif
                 </div>
             </div>
+            <div class="card-body">
+                @if($reviews && $reviews->count() > 0)
+                    <!-- Rating Summary -->
+                    @if($reviewCount > 1)
+                        <div class="rating-summary mb-4 p-3 bg-light rounded">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="text-center">
+                                        <div class="display-4 fw-bold text-primary">{{ number_format($averageRating, 1) }}</div>
+                                        <div class="rating mb-2">
+                                            @for($i = 1; $i <= 5; $i++)
+                                                <i class="fas fa-star {{ $i <= round($averageRating) ? 'text-warning' : 'text-muted' }}"></i>
+                                            @endfor
+                                        </div>
+                                        <div class="text-muted">Based on {{ $reviewCount }} reviews</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    @foreach([5,4,3,2,1] as $star)
+                                        <div class="d-flex align-items-center mb-1">
+                                            <span class="me-2">{{ $star }}</span>
+                                            <i class="fas fa-star text-warning me-2" style="font-size: 0.8rem;"></i>
+                                            <div class="progress flex-grow-1 me-2" style="height: 8px;">
+                                                <div class="progress-bar bg-warning" 
+                                                     style="width: {{ $reviewCount > 0 ? ($ratingBreakdown[$star] / $reviewCount) * 100 : 0 }}%">
+                                                </div>
+                                            </div>
+                                            <span class="text-muted small">{{ $ratingBreakdown[$star] }}</span>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+
+                    <!-- Individual Reviews -->
+                    <div class="reviews-list">
+                        @foreach($reviews as $review)
+                            <div class="review-item mb-4 pb-3 {{ !$loop->last ? 'border-bottom' : '' }}">
+                                <div class="d-flex align-items-start">
+                                    <div class="review-avatar me-3">
+                                        <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" 
+                                             style="width: 40px; height: 40px; font-size: 1.2rem;">
+                                            {{ strtoupper(substr($review->customer_name ?? 'C', 0, 1)) }}
+                                        </div>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                            <div>
+                                                <div class="fw-bold">{{ $review->customer_name ?? 'Customer' }}</div>
+                                                <div class="rating mb-1">
+                                                    @for($i = 1; $i <= 5; $i++)
+                                                        <i class="fas fa-star {{ $i <= $review->rating ? 'text-warning' : 'text-muted' }}" 
+                                                           style="font-size: 0.9rem;"></i>
+                                                    @endfor
+                                                </div>
+                                            </div>
+                                            <small class="text-muted">{{ $review->created_at->format('M d, Y') }}</small>
+                                        </div>
+                                        <p class="mb-0 text-dark">{{ $review->comment }}</p>
+                                        
+                                        <!-- Verified Purchase Badge -->
+                                        <div class="mt-2">
+                                            <span class="badge bg-success-subtle text-success border border-success-subtle">
+                                                <i class="fas fa-check-circle me-1" style="font-size: 0.8rem;"></i>
+                                                Verified Purchase
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+
+                    <!-- Pagination -->
+                    @if($reviews->hasPages())
+                        <div class="d-flex justify-content-center mt-4">
+                            {{ $reviews->links() }}
+                        </div>
+                    @endif
+
+                @else
+                    <!-- No Reviews State -->
+                    <div class="text-center py-5">
+                        <i class="fas fa-star fa-3x text-muted mb-3"></i>
+                        <h6 class="text-muted">No reviews yet</h6>
+                        <p class="text-muted mb-0">Be the first to review this material!</p>
+                    </div>
+                @endif
+            </div>
         </div>
+    </div>
+</div>
     </div>
 </div>
 

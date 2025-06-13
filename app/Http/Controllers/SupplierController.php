@@ -5,11 +5,33 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\View;
 use App\Models\User;
 use App\Models\Supplier;
+use App\Models\Category;
 
 class SupplierController extends Controller
 {
+
+    public function __construct()
+    {
+        // Middleware to share categories for supplier views
+        $this->middleware(function ($request, $next) {
+            try {
+                if (Auth::check() && Auth::user()->role === 'supplier') {
+                    $categories = Category::with('subCategories')->get();
+                    View::share('categories', $categories);
+                } else {
+                    View::share('categories', collect());
+                }
+            } catch (\Exception $e) {
+                View::share('categories', collect());
+            }
+
+            return $next($request);
+        });
+    }
+
     /**
      * Display the supplier profile page.
      */

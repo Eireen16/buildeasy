@@ -1,3 +1,7 @@
+@php
+    $categories = $categories ?? \App\Models\Category::with('subCategories')->get();
+@endphp
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -127,16 +131,11 @@
                 </div>
                 <div class="col-md-6 col-sm-12 my-2">
                     <div class="search-container">
-                        <input type="text" class="form-control" placeholder="Search Products">
-                        <button type="submit">
-                            <i class="fas fa-search"></i>
-                        </button> 
-                        <!-- <form action="{{ route('materials.search') }}" method="GET" class="flex w-full">
-                        <input type="text" name="query" placeholder="Search Listings" value="{{ request('query') }}"
-                             class="w-full px-4 py-2 border rounded-l-lg">
-                        <button type="submit" class="bg-blue-600 text-white px-4 rounded-r-lg">
-                           🔍
-                        </button> -->
+                        <form action="{{ route('customer.search') }}" method="GET" class="d-flex">
+                            <input type="text" name="search" class="form-control" placeholder="Search Products" value="{{ request('search') }}">
+                            <button type="submit" class="btn btn-primary ms-2">
+                                <i class="fas fa-search"></i>
+                            </button>
                         </form>
                     </div>
                 </div>
@@ -190,11 +189,24 @@
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Category</a>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="{{ url('/customer/category/cement') }}">Cement</a></li>
-                        <li><a class="dropdown-item" href="{{ url('/customer/category/steel') }}">Steel</a></li>
-                        <li><a class="dropdown-item" href="{{ url('/customer/category/bricks') }}">Bricks</a></li>
-                        <li><a class="dropdown-item" href="{{ url('/customer/category/sand') }}">Sand</a></li>
-                        <li><a class="dropdown-item" href="{{ url('/customer/category/tools') }}">Tools</a></li>
+                        @foreach($categories as $category)
+                            <li class="dropdown-submenu">
+                                <a class="dropdown-item dropdown-toggle" href="{{ route('customer.category', $category->id) }}">
+                                    {{ $category->category }}
+                                </a>
+                                @if($category->subCategories->count() > 0)
+                                    <ul class="dropdown-menu">
+                                        @foreach($category->subCategories as $subCategory)
+                                            <li>
+                                                <a class="dropdown-item" href="{{ route('customer.subcategory', [$category->id, $subCategory->id]) }}">
+                                                    {{ $subCategory->subcategory }}
+                                                </a>
+                                            </li>
+                                        @endforeach
+                                    </ul>
+                                @endif
+                            </li>
+                        @endforeach
                     </ul>
                 </li>
                 <li class="nav-item">
@@ -248,6 +260,33 @@
             }
         }
     </script>
+
+    <style>
+    .dropdown-submenu {
+        position: relative;
+    }
+
+    .dropdown-submenu .dropdown-menu {
+        top: 0;
+        left: 100%;
+        margin-top: -1px;
+    }
+
+    .dropdown-submenu:hover .dropdown-menu {
+        display: block;
+    }
+
+    .dropdown-item.dropdown-toggle::after {
+        display: inline-block;
+        margin-left: auto;
+        vertical-align: 0.255em;
+        content: "";
+        border-top: 0.3em solid transparent;
+        border-right: 0;
+        border-bottom: 0.3em solid transparent;
+        border-left: 0.3em solid;
+    }
+    </style>
 
 </body>
 </html>

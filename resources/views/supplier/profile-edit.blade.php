@@ -70,11 +70,40 @@
                            value="{{ old('address', $supplier->address) }}">
                 </div>
 
-                <!-- Location -->
+                <!-- Location (State Dropdown) -->
                 <div class="mb-3">
-                    <label for="location" class="form-label">Location</label>
-                    <input type="text" name="location" id="location" class="form-control"
-                           value="{{ old('location', $supplier->location) }}">
+                    <label for="location" class="form-label">State/Location</label>
+                    <select name="location" id="location" class="form-select">
+                        <option value="">Select your state</option>
+                        @php
+                            $malaysianStates = [
+                                'Johor',
+                                'Kedah', 
+                                'Kelantan',
+                                'Kuala Lumpur',
+                                'Labuan',
+                                'Melaka',
+                                'Negeri Sembilan',
+                                'Pahang',
+                                'Penang',
+                                'Perak',
+                                'Perlis',
+                                'Putrajaya',
+                                'Sabah',
+                                'Sarawak',
+                                'Selangor',
+                                'Terengganu'
+                            ];
+                            $currentLocation = old('location', $supplier->location);
+                        @endphp
+                        
+                        @foreach($malaysianStates as $state)
+                            <option value="{{ $state }}" {{ $currentLocation == $state ? 'selected' : '' }}>
+                                {{ $state }}
+                            </option>
+                        @endforeach
+                    </select>
+                    <div class="form-text">Select the state where your business is located</div>
                 </div>
 
                 <!-- Bank Details -->
@@ -104,4 +133,21 @@
         </div>
     </div>
 </div>
+
+<style>
+.form-select:focus {
+    border-color: #2980b9;
+    box-shadow: 0 0 0 0.2rem rgba(41, 128, 185, 0.25);
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #2980b9;
+    box-shadow: 0 0 0 0.2rem rgba(41, 128, 185, 0.25);
+}
+
+.form-text {
+    color: #6c757d;
+    font-size: 0.875em;
+}
+</style>
 @endsection

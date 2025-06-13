@@ -37,5 +37,16 @@ class Customer extends Model
         }
         return $this->cart;
     }
+
+    //Customer Order Relationship
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
 }
 

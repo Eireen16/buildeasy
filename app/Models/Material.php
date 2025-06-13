@@ -72,4 +72,14 @@ class Material extends Model
     {
         return $this->images->first()->image_path ?? 'images/placeholder.jpg';
     }
+
+    public function orderItems()
+    {
+        return $this->hasMany(OrderItem::class);
+    }
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
 }

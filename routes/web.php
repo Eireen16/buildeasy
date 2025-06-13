@@ -10,6 +10,12 @@ use App\Http\Controllers\MaterialController;
 use App\Http\Controllers\SupplierMaterialController;
 use App\Http\Controllers\CustomerMaterialController;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\OrderController;
+use App\Http\Controllers\SupplierOrderController;
+use App\Http\Controllers\CustomerOrderController;
+use App\Http\Controllers\SupplierOrderHistoryController;
+use App\Http\Controllers\CustomerOrderHistoryController;
+use App\Http\Controllers\ReviewController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 
@@ -62,17 +68,44 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/customer/dashboard', [CustomerMaterialController::class, 'index'])->name('customer.dashboard');
     Route::get('/customer/materials/{id}', [CustomerMaterialController::class, 'show'])->name('customer.materials.show');
 
+    //customer search material
+    Route::get('/customer/search', [CustomerMaterialController::class, 'search'])->name('customer.search');
+
+    // category and subcategory routes
+    Route::get('/customer/category/{categoryId}', [CustomerMaterialController::class, 'showByCategory'])->name('customer.category');
+    Route::get('/customer/category/{categoryId}/subcategory/{subCategoryId}', [CustomerMaterialController::class, 'showBySubCategory'])->name('customer.subcategory');
+
     // Cart routes
     Route::get('/customer/cart', [CartController::class, 'index'])->name('customer.cart.index');
     Route::post('/customer/cart/add', [CartController::class, 'addToCart'])->name('customer.cart.add');
     Route::patch('/customer/cart/update/{id}', [CartController::class, 'updateQuantity'])->name('customer.cart.update');
     Route::delete('/customer/cart/remove/{id}', [CartController::class, 'removeItem'])->name('customer.cart.remove');
+
+    //Checkout routes
+    Route::get('/checkout', [OrderController::class, 'checkout'])->name('checkout.form');
+    Route::post('/checkout', [OrderController::class, 'processCheckout'])->name('checkout.process');
+    Route::get('/checkout/success', [OrderController::class, 'success'])->name('checkout.success');
+    Route::get('/checkout/cancel', [OrderController::class, 'cancel'])->name('checkout.cancel');
+
+    //customer view my order page route
+    Route::get('/customer/orders', [App\Http\Controllers\CustomerOrderController::class, 'index'])->name('customer.orders.index');
+    Route::put('/customer/orders/{order}/cancel', [App\Http\Controllers\CustomerOrderController::class, 'cancelOrder'])->name('customer.orders.cancel');
+
+    //customer view order history route
+    Route::get('/customer/orders/history', [CustomerOrderHistoryController::class, 'index'])->name('customer.orders.history');
+
+    //customer track order  and view pickup address route
+    Route::get('/track-order/{order_id}', [CustomerOrderController::class, 'trackOrder'])->name('customer.track.order');
+    Route::get('/orders/{order}/pickup', [CustomerOrderController::class, 'showPickupAddress'])->name('orders.pickup');
+
+    //Customer write reviews route
+        Route::get('/customer/order-items/{orderItem}/review', [ReviewController::class, 'create'])->name('customer.reviews.create');
+        Route::post('/customer/order-items/{orderItem}/review', [ReviewController::class, 'store'])->name('customer.reviews.store');
+        Route::get('/customer/order-items/{orderItem}/can-review', [ReviewController::class, 'canReview'])->name('customer.reviews.can-review');
+
+    //Route::get('/debug-cart', [CartController::class, 'debugCart'])->name('debug.cart');
 });
 
-
-//!!!!SEARCH FROM CUSTOMER LAYOUT (REMOVE SOON) !!!!!!
-Route::get('/search', [App\Http\Controllers\CustomerMaterialController::class, 'search'])->name('customer.materials.search');
-Route::get('/materials/search', [CustomerMaterialController::class, 'search'])->name('materials.search');
 
 // Supplier dashboard route after log in
 Route::get('/supplier/dashboard', function () {
@@ -100,10 +133,25 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/supplier/dashboard', [SupplierMaterialController::class, 'index'])->name('supplier.dashboard');
     Route::get('/supplier/materials/{id}', [SupplierMaterialController::class, 'show'])->name('supplier.materials.show');
 
+    //Supplier search route
+    Route::get('/supplier/search', [SupplierMaterialController::class, 'search'])->name('supplier.search');
+
+    // Category routes
+    Route::get('/category/{categoryId}', [SupplierMaterialController::class, 'categoryView'])->name('supplier.category');
+    Route::get('/category/{categoryId}/subcategory/{subCategoryId}', [SupplierMaterialController::class, 'subCategoryView'])->name('supplier.subcategory');
+
     //Supplier Edit and Delete Material
-        Route::get('/materials/{material}/edit', [MaterialController::class, 'edit'])->name('materials.edit');
-        Route::put('/materials/{material}', [MaterialController::class, 'update'])->name('materials.update');
-        Route::delete('/materials/{material}', [MaterialController::class, 'destroy'])->name('materials.destroy');
+    Route::get('/materials/{material}/edit', [MaterialController::class, 'edit'])->name('materials.edit');
+    Route::put('/materials/{material}', [MaterialController::class, 'update'])->name('materials.update');
+    Route::delete('/materials/{material}', [MaterialController::class, 'destroy'])->name('materials.destroy');
+
+    //Supplier view my order page route
+    Route::get('/supplier/orders', [App\Http\Controllers\SupplierOrderController::class, 'index'])->name('supplier.orders.index');
+    Route::put('/supplier/orders/{order}/status', [App\Http\Controllers\SupplierOrderController::class, 'updateStatus'])->name('supplier.orders.updateStatus');
+    Route::put('/supplier/orders/{order}/cancel', [App\Http\Controllers\SupplierOrderController::class, 'cancelOrder'])->name('supplier.orders.cancel');
+
+    //supplier go to history page route
+     Route::get('/supplier/orders/history', [SupplierOrderHistoryController::class, 'index'])->name('supplier.orders.history');
   });
 
 

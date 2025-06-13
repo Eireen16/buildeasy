@@ -16,4 +16,9 @@ class MaterialVariation extends Model
     {
         return $this->belongsTo(Material::class);
     }
+
+    public function orderItems()
+    {
+        return $this->hasMany(OrderItem::class);
+    }
 }
