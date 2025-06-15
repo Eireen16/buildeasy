@@ -142,13 +142,6 @@
                 <div class="col-md-4 col-sm-12">
                     <div class="header-icon-container justify-content-end">
                         <div class="text-center">
-                            <button class="icon-btn" onclick="window.location.href='{{ url('/customer/chats') }}'">
-                                <i class="fas fa-comments"></i>
-                            </button>
-                            <span class="nav-labels">Chats</span>
-                        </div>
-                        
-                        <div class="text-center">
                             <div class="position-relative d-inline-block">
                                 <button class="icon-btn" onclick="window.location.href='{{ url('/customer/cart') }}'">
                                     <i class="fas fa-shopping-cart"></i>
@@ -158,6 +151,18 @@
                                 @endif
                             </div>
                             <span class="nav-labels">My cart</span>
+                        </div>
+                        <div class="text-center">
+                            <button class="icon-btn" onclick="Notification()">
+                                <i class="fas fa-bell"></i>
+                            </button>
+                            <span class="nav-labels">Notifications</span>
+                        </div>
+                        <div class="text-center">
+                            <button class="icon-btn" onclick="window.location.href='{{ url('/customer/chats') }}'">
+                                <i class="fas fa-comments"></i>
+                            </button>
+                            <span class="nav-labels">Chats</span>
                         </div>
                         
                         <div class="text-center">
@@ -210,13 +215,15 @@
                     </ul>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ url('/customer/budget-calculator') }}">Budget Calculator</a>
+                    <a class="nav-link" href="{{ route('customer.calculator.index') }}">Material Calculator</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="{{ url('/customer/orders') }}">My Orders</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ url('/customer/notifications') }}">Notification</a>
+                    <a class="nav-link" href="{{ route('customer.likes.index') }}">
+                        <i class="fas fa-heart me-1"></i>My Likes
+                    </a>
                 </li>
             </ul>
         </div>
@@ -258,6 +265,10 @@
                     cartBadge.remove();
                 }
             }
+        }
+
+        function Notification() {
+            alert('Notification will be implemented later');
         }
     </script>
 

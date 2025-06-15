@@ -74,6 +74,12 @@
                         <button class="btn btn-primary btn-lg me-2" onclick="addToCart()">
                             <i class="fas fa-shopping-cart"></i> Add to Cart
                         </button>
+                        
+                        <!-- Like Button -->
+                        <button class="btn btn-outline-danger btn-lg" id="likeButton" onclick="toggleLike({{ $material->id }})">
+                            <i class="fas fa-heart" id="heartIcon" style="{{ $isLiked ? 'color: red;' : '' }}"></i>
+                            <span id="likeText">{{ $isLiked ? 'Unlike' : 'Like' }}</span>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -438,6 +444,44 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function chatWithSupplier() {
     alert('Chat with supplier will be implemented later');
+}
+
+function toggleLike(materialId) {
+    const button = document.getElementById('likeButton');
+    const icon = document.getElementById('heartIcon');
+    const text = document.getElementById('likeText');
+    
+    // Disable button during request
+    button.disabled = true;
+    
+    fetch(`/customer/likes/toggle/${materialId}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'liked') {
+            icon.style.color = 'red';
+            text.textContent = 'Unlike';
+            // Optional: Show success message
+            showMessage('Material added to likes!', 'success');
+        } else if (data.status === 'unliked') {
+            icon.style.color = '';
+            text.textContent = 'Like';
+            // Optional: Show success message
+            showMessage('Material removed from likes!', 'info');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showMessage('Something went wrong. Please try again.', 'error');
+    })
+    .finally(() => {
+        button.disabled = false;
+    });
 }
 </script>
 

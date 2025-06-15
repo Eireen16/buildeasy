@@ -16,6 +16,9 @@ use App\Http\Controllers\CustomerOrderController;
 use App\Http\Controllers\SupplierOrderHistoryController;
 use App\Http\Controllers\CustomerOrderHistoryController;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\SalesController;
+use App\Http\Controllers\MaterialCalculatorController;
+use App\Http\Controllers\CustomerLikeController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 
@@ -99,9 +102,28 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/orders/{order}/pickup', [CustomerOrderController::class, 'showPickupAddress'])->name('orders.pickup');
 
     //Customer write reviews route
-        Route::get('/customer/order-items/{orderItem}/review', [ReviewController::class, 'create'])->name('customer.reviews.create');
-        Route::post('/customer/order-items/{orderItem}/review', [ReviewController::class, 'store'])->name('customer.reviews.store');
-        Route::get('/customer/order-items/{orderItem}/can-review', [ReviewController::class, 'canReview'])->name('customer.reviews.can-review');
+    Route::get('/customer/order-items/{orderItem}/review', [ReviewController::class, 'create'])->name('customer.reviews.create');
+    Route::post('/customer/order-items/{orderItem}/review', [ReviewController::class, 'store'])->name('customer.reviews.store');
+    Route::get('/customer/order-items/{orderItem}/can-review', [ReviewController::class, 'canReview'])->name('customer.reviews.can-review');
+
+    //Material Calculator route
+    Route::get('/material-calculator', [MaterialCalculatorController::class, 'index'])->name('customer.calculator.index');
+    
+    // Calculator API endpoints
+    Route::post('/calculator/paint', [MaterialCalculatorController::class, 'calculatePaint'])->name('calculator.paint');
+    Route::post('/calculator/tiles', [MaterialCalculatorController::class, 'calculateTiles'])->name('calculator.tiles');
+    Route::post('/calculator/bricks', [MaterialCalculatorController::class, 'calculateBricks'])->name('calculator.bricks');
+    Route::post('/calculator/concrete', [MaterialCalculatorController::class, 'calculateConcrete'])->name('calculator.concrete');
+    
+    // Calculator Save Project management 
+    Route::post('/calculator/save-project', [MaterialCalculatorController::class, 'saveProject'])->name('calculator.save-project');
+    Route::get('/calculator/saved-projects', [MaterialCalculatorController::class, 'getSavedProjects'])->name('calculator.saved-projects');
+    Route::delete('/calculator/project/{id}', [MaterialCalculatorController::class, 'deleteProject'])->name('calculator.delete-project');
+
+    // Likes routes
+    Route::get('/customer/likes', [CustomerLikeController::class, 'index'])->name('customer.likes.index');
+    Route::post('/customer/likes/toggle/{material}', [CustomerLikeController::class, 'toggle'])->name('customer.likes.toggle');
+    Route::delete('/customer/likes/remove/{material}', [CustomerLikeController::class, 'remove'])->name('customer.likes.remove');
 
     //Route::get('/debug-cart', [CartController::class, 'debugCart'])->name('debug.cart');
 });
@@ -152,6 +174,10 @@ Route::middleware(['auth'])->group(function () {
 
     //supplier go to history page route
      Route::get('/supplier/orders/history', [SupplierOrderHistoryController::class, 'index'])->name('supplier.orders.history');
+
+    // Generate Sales routes
+    Route::get('/sales', [SalesController::class, 'index'])->name('supplier.sales.index');
+    Route::get('/sales/export', [SalesController::class, 'export'])->name('supplier.sales.export');
   });
 
 
@@ -163,6 +189,15 @@ Route::get('/admin/dashboard', function () {
     return abort(403); // Forbidden
 })->middleware('auth')->name('admin.dashboard');
 
+// Admin Dashboard with User Management
+Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
+
+// View specific user details
+Route::get('/users/{id}', [AdminController::class, 'viewUser'])->name('admin.view-user');
+
+// Delete user
+Route::delete('/users/{id}', [AdminController::class, 'deleteUser'])->name('admin.delete-user');
+
 // Admin view Pending suppliers list
 Route::get('/admin/pending-suppliers', [AdminController::class, 'pendingSuppliers'])->name('admin.pending.suppliers');
 
@@ -171,6 +206,25 @@ Route::post('/admin/approve-supplier/{id}', [AdminController::class, 'approveSup
 
 //Admin Delete supplier
 Route::delete('/admin/delete-supplier/{id}', [AdminController::class, 'deleteSupplier'])->name('admin.delete.supplier');
+
+// Backward compatibility route
+Route::get('/users', [AdminController::class, 'viewUsers'])->name('admin.view-users');
+
+// New Materials Management Routes
+Route::get('/admin/materials', [AdminController::class, 'viewMaterials'])->name('admin.materials');
+Route::get('/admin/materials/{id}', [AdminController::class, 'viewMaterial'])->name('admin.materials.show');
+Route::delete('/admin/materials/{id}', [AdminController::class, 'deleteMaterial'])->name('admin.materials.delete');
+
+// Category Management Routes
+Route::get('/categories', [AdminController::class, 'manageCategories'])->name('admin.categories');
+Route::post('/categories', [AdminController::class, 'storeCategory'])->name('admin.categories.store');
+Route::put('/admin/categories/{id}', [AdminController::class, 'updateCategory'])->name('admin.categories.update');
+Route::delete('/admin/categories/{id}', [AdminController::class, 'deleteCategory'])->name('admin.categories.delete');
+
+// Subcategory Management Routes
+Route::post('/subcategories', [AdminController::class, 'storeSubCategory'])->name('admin.subcategories.store');
+Route::put('/admin/subcategories/{id}', [AdminController::class, 'updateSubCategory'])->name('admin.subcategories.update');
+Route::delete('/admin/subcategories/{id}', [AdminController::class, 'deleteSubCategory'])->name('admin.subcategories.delete');
 
 // Logout Route
 Route::post('/logout', function () {

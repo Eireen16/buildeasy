@@ -22,9 +22,18 @@ class Supplier extends Model
         'is_approved',
     ];
 
+    protected $casts = [
+        'is_approved' => 'boolean',
+    ];
+
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function materials()
+    {
+        return $this->hasMany(Material::class);
     }
 
     public function orders()

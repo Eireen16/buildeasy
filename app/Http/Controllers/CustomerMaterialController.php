@@ -7,7 +7,9 @@ use App\Models\Review;
 use App\Models\Supplier;
 use App\Models\Category;
 use App\Models\SubCategory;
+use App\Models\Customer;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class CustomerMaterialController extends Controller
 {
@@ -256,7 +258,15 @@ class CustomerMaterialController extends Controller
             2 => $allReviews->where('rating', 2)->count(),
             1 => $allReviews->where('rating', 1)->count(),
         ];
+
+        $isLiked = false;
+        if (Auth::check()) {
+            $customer = Customer::where('user_id', Auth::id())->first();
+            if ($customer) {
+                $isLiked = $material->isLikedBy($customer->id);
+            }
+        }
         
-        return view('customer.materials.show', compact('material', 'reviews', 'averageRating', 'reviewCount', 'ratingBreakdown'));
+        return view('customer.materials.show', compact('material', 'reviews', 'averageRating', 'reviewCount', 'ratingBreakdown', 'isLiked'));
     }
 }

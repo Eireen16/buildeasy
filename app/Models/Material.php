@@ -82,4 +82,14 @@ class Material extends Model
     {
         return $this->hasMany(Review::class);
     }
+
+    public function likes()
+    {
+        return $this->hasMany(Like::class);
+    }
+
+    public function isLikedBy($customerId)
+    {
+        return $this->likes()->where('customer_id', $customerId)->exists();
+    }
 }

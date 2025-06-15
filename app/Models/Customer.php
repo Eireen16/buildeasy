@@ -48,5 +48,20 @@ class Customer extends Model
     {
         return $this->hasMany(Review::class);
     }
+
+    public function calculatorProjects()
+    {
+        return $this->hasMany(CalculatorSavedProject::class);
+    }
+
+    public function likes()
+    {
+        return $this->hasMany(Like::class);
+    }
+
+    public function likedMaterials()
+    {
+        return $this->belongsToMany(Material::class, 'likes');
+    }
 }
 

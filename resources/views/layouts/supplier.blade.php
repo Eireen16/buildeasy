@@ -154,6 +154,12 @@
                 <div class="col-md-4 col-sm-12">
                     <div class="header-icon-container justify-content-end">
                         <div class="text-center">
+                            <button class="icon-btn" onclick="Notification()">
+                                <i class="fas fa-bell"></i>
+                            </button>
+                            <span class="nav-labels">Notifications</span>
+                        </div>
+                        <div class="text-center">
                             <button class="icon-btn" onclick="window.location.href='{{ url('/supplier/chats') }}'">
                                 <i class="fas fa-comments"></i>
                             </button>
@@ -168,8 +174,6 @@
                                 <span class="nav-labels">My account</span>
                                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="accountDropdown">
                                     <li><a class="dropdown-item" href="{{ url('/supplier/profile') }}">My Profile</a></li>
-                                    <li><hr class="dropdown-divider"></li>
-                                    <li><a class="dropdown-item" href="{{ url('/supplier/sales') }}">Sales</a></li>
                                     <li><hr class="dropdown-divider"></li>
                                     <li>
                                         <form method="POST" action="{{ route('logout') }}">
@@ -220,7 +224,7 @@
                     <a class="nav-link" href="{{ url('/supplier/orders') }}">My Orders</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ url('/supplier/notifications') }}">Notification</a>
+                    <a class="nav-link" href="{{ route('supplier.sales.index') }}">Generate Sales</a>
                 </li>
             </ul>
         </div>
@@ -238,5 +242,11 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        function Notification() {
+            alert('Notification will be implemented later');
+        }
+    </script>
 </body>
 </html>
